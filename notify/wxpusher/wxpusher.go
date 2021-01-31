@@ -33,6 +33,7 @@ import (
 )
 
 var userAgentHeader = fmt.Sprintf("Alertmanager/%s", version.Version)
+var wxPusherAPIURL = "https://wxpusher.zjiecode.com/api/send/message"
 
 // Notifier implements a Notifier for generic wxpusher.
 type Notifier struct {
@@ -92,7 +93,7 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*types.Alert) (bool, er
 	msg := &Message{
 		Summary:     "",
 		Content:     tmplText(n.conf.Message),
-		ContentType: 1,
+		ContentType: 3,
 		AppToken:    n.conf.Token,
 		TopicIDs:    n.conf.Topics,
 		UIDs:        n.conf.UID,
@@ -103,7 +104,11 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*types.Alert) (bool, er
 		return false, err
 	}
 
-	req, err := http.NewRequest("POST", n.conf.URL.String(), &buf)
+	reqURL := wxPusherAPIURL
+	if n.conf.URL != nil {
+		reqURL = n.conf.URL.String()
+	}
+	req, err := http.NewRequest("POST", reqURL, &buf)
 	if err != nil {
 		return true, err
 	}
