@@ -267,6 +267,11 @@ func (c *Config) UnmarshalYAML(unmarshal func(interface{}) error) error {
 				wh.HTTPConfig = c.Global.HTTPConfig
 			}
 		}
+		for _, wx := range rcv.WxPusherConfigs {
+			if wx.HTTPConfig == nil {
+				wx.HTTPConfig = c.Global.HTTPConfig
+			}
+		}
 		for _, ec := range rcv.EmailConfigs {
 			if ec.Smarthost.String() == "" {
 				if c.Global.SMTPSmarthost.String() == "" {
@@ -698,6 +703,7 @@ type Receiver struct {
 	WebhookConfigs   []*WebhookConfig   `yaml:"webhook_configs,omitempty" json:"webhook_configs,omitempty"`
 	OpsGenieConfigs  []*OpsGenieConfig  `yaml:"opsgenie_configs,omitempty" json:"opsgenie_configs,omitempty"`
 	WechatConfigs    []*WechatConfig    `yaml:"wechat_configs,omitempty" json:"wechat_configs,omitempty"`
+	WxPusherConfigs  []*WxPusherConfig  `yaml:"wxpusher_configs,omitempty" json:"wxpusher_configs,omitempty"`
 	PushoverConfigs  []*PushoverConfig  `yaml:"pushover_configs,omitempty" json:"pushover_configs,omitempty"`
 	VictorOpsConfigs []*VictorOpsConfig `yaml:"victorops_configs,omitempty" json:"victorops_configs,omitempty"`
 }

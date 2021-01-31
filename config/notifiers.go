@@ -32,6 +32,14 @@ var (
 		},
 	}
 
+	// DefaultWxPusherConfig defines default values for wxpusher configurations.
+	DefaultWxPusherConfig = WxPusherConfig{
+		NotifierConfig: NotifierConfig{
+			VSendResolved: true,
+		},
+		Message: `{{ template "wechat.default.message" . }}`,
+	}
+
 	// DefaultEmailConfig defines default values for Email configurations.
 	DefaultEmailConfig = EmailConfig{
 		NotifierConfig: NotifierConfig{
@@ -386,6 +394,31 @@ func (c *WebhookConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 	if c.URL.Scheme != "https" && c.URL.Scheme != "http" {
 		return fmt.Errorf("scheme required for webhook url")
+	}
+	return nil
+}
+
+// WxPusherConfig configures notifications via wxpusher.
+type WxPusherConfig struct {
+	NotifierConfig `yaml:",inline" json:",inline"`
+
+	HTTPConfig *commoncfg.HTTPClientConfig `yaml:"http_config,omitempty" json:"http_config,omitempty"`
+
+	// URL to send POST request to.
+	URL *URL `yaml:"url" json:"url"`
+
+	Message string   `yaml:"message,omitempty" json:"message,omitempty"`
+	Token   string   `yaml:"token,omitempty" json:"token,omitempty"`
+	Topics  []int    `yaml:"topics,omitempty" json:"topics,omitempty"`
+	UID     []string `yaml:"uid,omitempty" json:"uid,omitempty"`
+}
+
+// UnmarshalYAML implements the yaml.Unmarshaler interface.
+func (c *WxPusherConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	*c = DefaultWxPusherConfig
+	type plain WxPusherConfig
+	if err := unmarshal((*plain)(c)); err != nil {
+		return err
 	}
 	return nil
 }
